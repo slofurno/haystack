@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+a{
+  cursor: pointer; 
+}
+a:hover{
+  text-decoration: underline;
+}
+</style>
+<body>
+  <div id="root">
+    <input type="text" class="js-toggle" placeholder="name" name="name"/>
+
+    <select class="js-toggle" name="role" >
+      <option value="superuser">superuser</option>
+      <option value="admin">admin</option>
+    </select>
+  
+  </div>
+  <script>
+
+  var nodes = [].slice.call(document.getElementsByClassName("js-toggle"));
+
+  nodes.map(makeToggle);
+
+  function button (text) {
+    var el = document.createElement("input");
+    el.type = "button";
+    el.value= text;
+    return el;
+  }
+
+  function onChange (name, value) {
+    console.log(name, value);
+  }
+
+  function makeToggle(node) {
+    var parent = node.parentNode;
+    var name = node.name;
+    var value = node.value || node.placeholder;
+    
+    var container = document.createElement("div");
+    parent.replaceChild(container, node); 
+
+    var ok = button("ok");
+    var cancel = button(" x ");
+    var textel = document.createElement("a");
+    textel.innerHTML = "A: " + node.value;
+
+    ok.onclick = function (e) {
+      e.preventDefault();
+      value = node.value; 
+      showText();
+      onChange(name, value);
+    }
+
+    cancel.onclick = function (e) {
+      e.preventDefault();
+      node.value = value;
+      showText();
+    }
+
+    function showText () {
+      container.innerHTML = "";
+      textel.innerHTML = value;
+      container.appendChild(textel);
+    }
+
+    function showReal () {
+      container.innerHTML = "";
+      container.appendChild(node);
+      container.appendChild(ok);
+      container.appendChild(cancel);
+    }
+
+    textel.onclick = showReal;
+    showText();
+  }
+
+  </script>
+</body>
+</html>
