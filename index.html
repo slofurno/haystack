@@ -20,12 +20,65 @@ a:hover{
       <option value="admin">admin</option>
     </select>
   
+    <input type="text" class="js-toggle" value="philly" placeholder="city" name="city"/>
+
+    <input type="text" class="js-toggle" placeholder="company" name="company"/>
   </div>
   <script>
 
-  var nodes = [].slice.call(document.getElementsByClassName("js-toggle"));
+  function zip (xs, ys) {
+    var r = [];
+    var c = Math.min(xs.length, ys.length);
+    for (var i = 0; i < c; i++) {
+      r.push([xs[i], ys[i]]);
+    }
+    return r;
+  }
 
-  nodes.map(makeToggle);
+  (function(){
+    let select = x => document.querySelector(x)
+    let selectAll = x => [].slice.call(document.querySelectorAll(x))
+    let html = x => x.outerHTML
+    let click = x => x.click()
+
+    let root = select("#root")
+    let preToggle = selectAll(".js-toggle").map(html)
+
+    let changes = []
+    let collectChanges = (name, value) => changes.push({name, value})
+
+    selectAll(".js-toggle").map(x => Toggle(x, collectChanges))
+    selectAll("a").forEach(click)
+
+    let postToggle = selectAll(".js-toggle").map(html)
+
+    let expectInputsToDisplayWhenLinkClicked = zip(preToggle, postToggle).map(([x,y]) => x === y)
+    console.log(expectInputsToDisplayWhenLinkClicked) //[true, true, true, true]
+
+    let name = select("input[name='name']")
+    name.value = "steve"
+
+    selectAll(".cancel").forEach(click)
+
+    let links1 = ["<a>name</a>", "<a>superuser</a>", "<a>philly</a>", "<a>company</a>"]
+    let linkText = selectAll(".js-toggle-container").map(x => x.innerHTML)
+    let expectLinkTextToEqualValueOrPlaceholder = zip(linkText, links1).map(([x,y]) => x === y)
+    console.log(expectLinkTextToEqualValueOrPlaceholder) //[true, true, true, true]
+
+    selectAll(".js-toggle-container a").forEach(click)
+    name.value = "steve"
+    selectAll(".js-toggle-container .accept").forEach(click)
+
+    let changedText = ["<a>steve</a>", "<a>superuser</a>", "<a>philly</a>", "<a>company</a>"]
+    let acceptedText = selectAll(".js-toggle-container").map(x => x.innerHTML)
+    let expectAcceptedChangesModifiesLink = zip(changedText, acceptedText).map(([x,y]) => x === y)
+    console.log(expectAcceptedChangesModifiesLink) //[true, true, true, true]
+
+    let expectOnlyAcceptedChangesFireOnChange = (changes.length === 1)
+    console.log(expectOnlyAcceptedChangesFireOnChange) //true
+    console.log(changes[0]) //{name: "name", value: "steve"}
+
+  }())
 
   function button (text) {
     var el = document.createElement("input");
@@ -34,28 +87,28 @@ a:hover{
     return el;
   }
 
-  function onChange (name, value) {
-    console.log(name, value);
-  }
-
-  function makeToggle(node) {
+  function Toggle(node, onChange) {
     var parent = node.parentNode;
     var name = node.name;
     var value = node.value || node.placeholder;
     
     var container = document.createElement("div");
+    container.className = "js-toggle-container";
     parent.replaceChild(container, node); 
 
-    var ok = button("ok");
+    var ok = button(" ok ");
+    ok.className = "accept";
     var cancel = button(" x ");
+    cancel.className = "cancel";
     var textel = document.createElement("a");
-    textel.innerHTML = "A: " + node.value;
 
     ok.onclick = function (e) {
       e.preventDefault();
-      value = node.value; 
+      if (node.value !== value) {
+        value = node.value; 
+        onChange(name, value);
+      }
       showText();
-      onChange(name, value);
     }
 
     cancel.onclick = function (e) {
@@ -70,14 +123,14 @@ a:hover{
       container.appendChild(textel);
     }
 
-    function showReal () {
+    function showInput () {
       container.innerHTML = "";
       container.appendChild(node);
       container.appendChild(ok);
       container.appendChild(cancel);
     }
 
-    textel.onclick = showReal;
+    textel.onclick = showInput;
     showText();
   }
 
