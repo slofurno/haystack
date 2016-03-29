@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+a{
+  cursor: pointer; 
+}
+a:hover{
+  text-decoration: underline;
+}
+.container {
+  width: 100%;
+  padding: 20px;
+  background-color:gainsboro;
+}
+</style>
+<body>
+  <div id="root" class="container">
+    <input type="text" placeholder="name" name="name"/>
+
+    <select name="role" >
+      <option value="superuser">superuser</option>
+      <option value="admin">admin</option>
+    </select>
+  
+    <input type="text" value="philly" placeholder="city" name="city"/>
+
+    <input type="text" placeholder="company" name="company"/>
+  </div>
+
+  <br>
+  <br>
+  <input id="get" type="button" value="get profile"/>
+  <div id="display"></div>
+  <script src="bundle.js"></script>
+</body>
+</html>
